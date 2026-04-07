@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>HTMX Cloudflare Template - Chat</title>
+
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="color-scheme" content="dark" />
+
+	<link rel="stylesheet" href="styles.css">
+
+	<script src="/lib/htmx-2.0.8.js"></script>
+	<script src="/lib/htmx-ws.js"></script>
+</head>
+
+<body hx-indicator="#loading-indicator">
+	<nav hx-target="body" hx-push-url="true" hx-swap="transition:true">
+		<a hx-get="/" href="/">Home</a>
+		<a hx-get="/data" href="/data">Data Entry</a>
+		<a hx-get="/chat" href="/chat" class="active">Live Chat</a>
+		<a hx-get="/admin" href="/admin">Admin</a>
+	</nav>
+
+	<img id="loading-indicator" class="loading-indicator" src="/img/spinner.svg" alt="Loading">
+
+	<style>
+		html,
+		body {
+			height: 100dvh;
+			margin: 0;
+		}
+
+		body {
+			display: flex;
+			flex-direction: column;
+		}
+
+		main {
+			margin-bottom: 1rem;
+			gap: 1rem;
+		}
+
+		/* In order for scrolling to work correctly, every parent element *except* the one that needs to scroll, needs to be .expandable */
+		.expandable {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 0;
+		}
+
+		.scrollable {
+			flex: 1;
+			overflow-y: auto;
+			min-height: 0;
+		}
+
+		.chat-container {
+			width: 100%;
+			margin: 0 auto;
+			display: flex;
+			flex-direction: column;
+			border: 1px solid ButtonBorder;
+			border-radius: 8px;
+		}
+
+		.chat-messages {
+			padding: 1rem;
+		}
+
+		.chat-form {
+			padding: 1rem;
+			display: flex;
+			flex-direction: row;
+			border-top: 1px solid ButtonBorder;
+			gap: 1rem;
+		}
+
+		.chat-form>input {
+			padding: 0.5rem;
+			flex-grow: 1;
+		}
+	</style>
+
+	<main class="expandable">
+		<h2>Live Chat</h2>
+
+		<section class="card">
+			<span>This chat room uses a persistent WebSocket to send and receive messages. All handled by the <a href="https://htmx.org/extensions/ws/">HTMX WebSocket extension</a> and <a href="https://htmx.org/attributes/hx-swap-oob/">out-of-band swaps</a>.</span>
+		</section>
+
+		<section class="expandable" hx-ext="ws" ws-connect="/ws/chat" hx-on::ws-after-message="const messages = document.getElementById('chat-messages'); messages.scrollTo(0, messages.scrollHeight);">
+			<div class="chat-container expandable">
+				<div class="chat-messages scrollable" id="chat-messages">
+					<!-- hx-swap-oob targets the id "chat-messages" -->
+				</div>
+
+				<form id="form" class="chat-form" ws-send hx-on::ws-after-send="document.getElementById('message-input').value = ''">
+					<input id="message-input" name="message" type="text" autocomplete="off" required>
+
+					<button type="submit">Send</button>
+				</form>
+			</div>
+		</section>
+	</main>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "htmx-cloudflare-template"
+compatibility_date = "2026-03-01"
+workers_dev = true
+main = "src/worker.ts"
+
+[assets]
+directory = "./src/public"
+
+[[durable_objects.bindings]]
+name = "DATA"
+class_name = "DataObject"
+
+[[durable_objects.bindings]]
+name = "CHAT"
+class_name = "ChatObject"
+ 
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DataObject", "ChatObject"]
+
+# After making a change to this file, use `npm run types`
