@@ -16,7 +16,7 @@ export function Root(title: string, main: JSX.Element) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<meta name="color-scheme" content="dark" />
 
-			<link rel="stylesheet" href="styles.css" />
+			<link rel="stylesheet" href="/styles.css" />
 
 			<script src="/lib/htmx-2.0.8.js"></script>
 			<script src="/lib/htmx-ws.js"></script>
