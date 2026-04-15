@@ -1,19 +1,10 @@
 import { Context, Metric } from "@/types";
 import { DataEntryRows } from "./DataEntryRows";
 import Layout from "@/components/Layout";
+import { html } from "hono/html";
 
 export function DataEntryPage(entries: Metric[]) {
 	const renderedAt = new Date(Date.now()).toISOString()
-
-	// This is kind of cheating. Uses an anonymous function to avoid issues when changing tabs.
-	const elapsedTimeCalculation = `
-	(() => {
-		const timeElement = document.getElementById('render-time');
-		const renderedAt = new Date(timeElement.dateTime).getTime()
-		const now = Date.now();
-		const elapsedMs = now - renderedAt;
-		timeElement.textContent = elapsedMs + 'ms ago';
-	})();`
 
 	return <>
 		<section hx-swap="innerHTML transition:true" class="column">
@@ -22,7 +13,20 @@ export function DataEntryPage(entries: Metric[]) {
 			<section class="card column">
 				<span>This page was generated server-side (<time id="render-time" datetime={renderedAt}></time>) and then sent to the browser in one request.</span>
 
-				<script dangerouslySetInnerHTML={{ __html: elapsedTimeCalculation }}></script>
+				{
+					// Uses an anonymous function to avoid issues when changing tabs.
+					html`
+						<script>
+							(() => {
+								const timeElement = document.getElementById('render-time');
+								const renderedAt = new Date(timeElement.dateTime).getTime()
+								const now = Date.now();
+								const elapsedMs = now - renderedAt;
+								timeElement.textContent = elapsedMs + 'ms ago';
+							})();
+						</script>
+					`
+				}
 
 				<span>The table rows are a separate, reusable component. When a row is added, modified, or deleted, only the necessary data is sent.</span>
 
