@@ -9,7 +9,6 @@ const templateName = "htmx-cloudflare-template";
 const filesToProcess = [
 	"wrangler.toml",
 	"package.json",
-	"package-lock.json"
 ];
 
 async function replaceInFile(filePath, replaceString, withString) {

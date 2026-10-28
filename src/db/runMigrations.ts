@@ -1,29 +1,18 @@
-import { createChatMessageTable, createMetricTable, createStatsTable } from "./Database";
+import { migrations } from "./Database";
 
 const setupMigrationTable = `
 CREATE TABLE IF NOT EXISTS __migrations
-(   
+(
 	name TEXT NOT NULL,
 	timestamp INTEGER DEFAULT (unixepoch('subsec') * 1000)
 )`
-
-type Migration = {
-	name: string;
-	script: string;
-}
 
 type MigrationRecord = {
 	name: string;
 	timestamp: number;
 }
 
-const migrations: Migration[] = [
-	createMetricTable,
-	createStatsTable,
-	createChatMessageTable
-]
-
-export default async function runMigrations(sql: SqlStorage) {
+export default function runMigrations(sql: SqlStorage) {
 	console.log("Running migrations...");
 
 	sql.exec(setupMigrationTable);

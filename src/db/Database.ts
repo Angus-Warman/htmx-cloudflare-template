@@ -1,61 +1,38 @@
-import { Generated } from "kysely";
+import { Kysely, Generated, Insertable, Selectable } from "kysely";
+import { DurableDialect } from "./DurableDialect";
 
-export interface Database {
-	metrics: MetricTable
-	stats: StatsTable
-	chatMessage: ChatMessageTable
+export interface Schema {
+    comments: CommentsTable;
 }
 
-export type MetricTable = {
-	ID: Generated<number>
-	timestamp: Generated<number>
-	expected: number
-	actual: number
-}
+export type CommentsTable = {
+    id: Generated<number>;
+    createdAt: Generated<number>;
+    author: string;
+    text: string;
+};
 
-export const createMetricTable = {
-	name: "Create metric table",
-	script: `
-		CREATE TABLE metrics (
-			ID INTEGER PRIMARY KEY,
-			timestamp INTEGER DEFAULT (unixepoch('subsec') * 1000),
-			expected REAL NOT NULL,
-			actual REAL NOT NULL
+export type Comment = Selectable<CommentsTable>;
+export type NewComment = Insertable<CommentsTable>;
+
+const createCommentsTable = {
+    name: "Create comments table",
+    script: `
+		CREATE TABLE comments (
+			id INTEGER PRIMARY KEY,
+			createdAt INTEGER DEFAULT (unixepoch('subsec') * 1000),
+			author TEXT NOT NULL,
+			text TEXT NOT NULL
 		) STRICT;
-	`
-}
+	`,
+};
 
-export type StatsTable = {
-	key: string
-	value: number
-}
+export const migrations = [createCommentsTable];
 
-export const createStatsTable = {
-	name: "Create stats table",
-	script: `
-		CREATE TABLE stats (
-			key TEXT PRIMARY KEY NOT NULL,
-			value INTEGER
-		);
+export type Database = Kysely<Schema>;
 
-		INSERT INTO stats VALUES ("visits", 0);
-		INSERT INTO stats VALUES ("clicks", 0);
-	`
-}
-
-export type ChatMessageTable = {
-	fromID: string;
-	timestamp: number;
-	content: string;
-}
-
-export const createChatMessageTable = {
-	name: "Create chatMessage table",
-	script: `
-		CREATE TABLE chatMessage (
-			fromID TEXT NOT NULL,
-			timestamp INTEGER NOT NULL,
-			content TEXT NOT NULL
-		);
-	`
+export function connectDB(ctx: DurableObjectState): Database {
+    return new Kysely<Schema>({
+        dialect: new DurableDialect({ ctx }),
+    });
 }
